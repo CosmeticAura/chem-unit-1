@@ -198,6 +198,7 @@ kbd{font:500 11px/1 var(--font);color:var(--ink-3);border:1px solid var(--line-e
 .sides{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-row)}.sides .sp{display:inline-flex;align-items:center;gap:6px}.sides .sp .small{margin-right:2px}
 .card .hint{position:absolute;bottom:12px;font-size:12px;color:var(--ink-3)}
 .card.flash-ok{animation:ok .35s ease-out}
+.card.flash-undo{animation:undo .3s ease-out}@keyframes undo{from{transform:translateX(-10px);opacity:.6}to{transform:none;opacity:1}}
 .card.flash-no{animation:no .35s ease-out}
 @keyframes ok{0%{border-color:var(--go);box-shadow:0 0 0 0 color-mix(in srgb,var(--go) 45%,transparent)}60%{box-shadow:0 0 0 10px transparent}100%{border-color:var(--line-edge)}}
 @keyframes no{0%{border-color:var(--stop)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}100%{transform:none;border-color:var(--line-edge)}}
@@ -2050,7 +2051,7 @@ function render(){
   bindStep(sec,s);
 }
 /* Jump to any step, forward or back, without losing the brain dump or sketch */
-function jump(sec,s,k){if(k===s.step)return;s.step=k;save();render();scrollTo({top:0,behavior:"smooth"})}
+function jump(sec,s,k){if(k===s.step)return;UNDO=[];s.step=k;save();render();scrollTo({top:0,behavior:"smooth"})}
 /* Clock helpers */
 const still=matchMedia("(prefers-reduced-motion: reduce)");
 function setClock(el,str){if(!el)return;const cur=[...el.querySelectorAll(".d")].map(d=>d.textContent).join("");if(cur===str)return;const old=el.querySelectorAll(".d");if(old.length!==str.length){el.innerHTML=[...str].map(ch=>'<span class="d">'+ch+"</span>").join("");return}[...str].forEach((ch,i)=>{if(old[i].textContent!==ch){const n=document.createElement("span");n.className="d"+(still.matches?"":" roll");n.textContent=ch;old[i].replaceWith(n)}})}
@@ -2058,7 +2059,7 @@ function dialSVG(r,id,head){return '<svg viewBox="0 0 '+(2*r+12)+" "+(2*r+12)+'"
 function setDial(id,frac,r){const a=document.getElementById(id);if(!a)return;frac=Math.max(0,Math.min(1,frac));a.setAttribute("stroke-dashoffset",String(1-frac));const h=document.getElementById(id+"h");if(h){const ang=frac*2*Math.PI;h.setAttribute("cx",(r+6+r*Math.cos(ang)).toFixed(2));h.setAttribute("cy",(r+6+r*Math.sin(ang)).toFixed(2));h.style.opacity=frac>0?1:0}}
 
 function go(id){S.cur=id||null;if(id){const s=st(id);if(s.status==="new"||s.status==="revisit"){if(s.status==="revisit"){s.status="active";}else s.status="active"}}save();render();scrollTo({top:0,behavior:"smooth"})}
-function next(sec,s){s.step++;if(s.step===2){s.fc=null}save();render();scrollTo({top:0,behavior:"smooth"})}
+function next(sec,s){UNDO=[];s.step++;if(s.step===2){s.fc=null}save();render();scrollTo({top:0,behavior:"smooth"})}
 
 /* Overview */
 function overview(){
@@ -2093,6 +2094,10 @@ function stepBreak(sec,s){
 }
 
 /* Step 3: flashcards */
+let UNDO=[];
+function canUndo(sec){return UNDO.length&&UNDO[UNDO.length-1].id===sec.id}
+function undoCard(sec,s){if(!canUndo(sec))return;const u=UNDO.pop();s.fc=JSON.parse(u.fc);s.passes=u.passes;s.fc.flip=true;save();render();const c=$("#card");if(c)c.classList.add("flash-undo");toast("Undid that card")}
+const undoBtn=sec=>'<button class="btn quiet" id="undo"'+(canUndo(sec)?"":" disabled")+'>Undo <kbd>&#8984;Z</kbd></button>';
 const PARTS=[["pic","Picture"],["name","Name"],["def","Definition"]];
 function sides(){if(!S.sides||!S.sides.front||!S.sides.back)S.sides={front:["pic"],back:["name","def"]};return S.sides}
 function face(c,parts){let p=PARTS.map(x=>x[0]).filter(k=>parts.includes(k)&&(k!=="pic"||c[2]));if(!p.length)p=["name"];
@@ -2108,12 +2113,12 @@ function stepCards(sec,s){
     const g=f.got.length,n=f.order.length;
     return '<section class="panel"><span class="eyebrow num">Pass '+s.passes+" done</span><div class=\"tally\"><div><b class=\"okc num\">"+g+'</b><span class="small">got it</span></div><div><b class="noc num">'+f.missed.length+'</b><span class="small">missed</span></div><div><b class="num">'+n+'</b><span class="small">cards</span></div></div>'+
     (f.missed.length?'<div class="notes"><p class="muted">Missed this pass:</p><ul>'+f.missed.map(k=>"<li>"+rich(sec.cards[k][0])+"</li>").join("")+"</ul></div>":"")+
-    '<div class="actions">'+(f.missed.length?'<button class="btn" id="again-m">Another pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Another pass on all</button>'+'<button class="btn primary" id="go">Take a break <kbd>Enter</kbd></button></div>'+quiz+"</section>";
+    '<div class="actions">'+undoBtn(sec)+(f.missed.length?'<button class="btn" id="again-m">Another pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Another pass on all</button>'+'<button class="btn primary" id="go">Take a break <kbd>Enter</kbd></button></div>'+quiz+"</section>";
   }
   const c=sec.cards[f.order[f.pos]];
   return '<section class="panel"><div class="fcbar num"><span>Pass '+s.passes+'</span><button class="loopt'+(S.loop?" on":"")+'" id="loopt" aria-pressed="'+(S.loop?"true":"false")+'" title="Keep shuffling new passes without stopping (L)">Loop'+(S.loop?" on":"")+'</button><span class="track"><i style="width:'+(100*f.pos/f.order.length)+'%"></i></span><span>'+(f.pos+1)+" / "+f.order.length+'</span></div>'+
   '<div class="card" id="card" role="button" tabindex="0" aria-label="Flip card">'+(function(){const pp=sides()[f.flip?"back":"front"],only=c[2]&&pp.length===1&&pp[0]==="pic";return (only?"":'<span class="side-l">'+(f.flip?"Back":"Front")+'</span>')+face(c,pp)})()+(f.flip||(c[2]&&sides().front.includes("pic"))?"":'<span class="hint">Click or press space to flip</span>')+'</div>'+
-  '<div class="actions" style="justify-content:center"><button class="btn no" id="miss"'+(f.flip?"":" disabled")+'>Missed <kbd>&larr;</kbd></button><button class="btn ok" id="got"'+(f.flip?"":" disabled")+'>Got it <kbd>&rarr;</kbd></button></div>'+sidePicker(sec)+quiz+"</section>";
+  '<div class="actions" style="justify-content:center">'+undoBtn(sec)+'<button class="btn no" id="miss"'+(f.flip?"":" disabled")+'>Missed <kbd>&larr;</kbd></button><button class="btn ok" id="got"'+(f.flip?"":" disabled")+'>Got it <kbd>&rarr;</kbd></button></div>'+sidePicker(sec)+quiz+"</section>";
 }
 
 /* Step 5: brain dump */
@@ -2150,6 +2155,7 @@ function bindStep(sec,s){
   }
   if(s.step===2){
     const f=s.fc;
+    const ub=$("#undo");if(ub)ub.onclick=()=>undoCard(sec,s);bindStep.undo=()=>undoCard(sec,s);
     const qs=$("#qskip");if(qs)qs.onclick=()=>{s.quizlet=true;s.fc=null;next(sec,s)};
     document.querySelectorAll(".sides [data-side]").forEach(b=>b.onclick=()=>{const sd=sides(),w=b.dataset.side,k=b.dataset.part,a=sd[w];
       if(a.includes(k)){if(a.length>1)a.splice(a.indexOf(k),1)}else a.push(k);save();render()});
@@ -2164,7 +2170,7 @@ function bindStep(sec,s){
     const card=$("#card");
     const flip=()=>{f.flip=!f.flip;save();render()};
     card.onclick=flip;
-    const mark=(ok)=>{if(!f.flip)return;const k=f.order[f.pos];(ok?f.got:f.missed).push(k);f.pos++;f.flip=false;
+    const mark=(ok)=>{if(!f.flip)return;UNDO.push({id:sec.id,fc:JSON.stringify(f),passes:s.passes});if(UNDO.length>200)UNDO.shift();const k=f.order[f.pos];(ok?f.got:f.missed).push(k);f.pos++;f.flip=false;
       if(S.loop&&f.pos>=f.order.length){const m=f.missed.length,g=f.got.length;newPass(sec,s,m?"missed":"all");toast(m?"Got "+g+", missed "+m+". Now just the "+m+" missed.":"Got all "+g+". Shuffling the full set again.")}
       save();render();const c2=$("#card");if(c2){c2.classList.add(ok?"flash-ok":"flash-no")}};
     $("#got").onclick=()=>mark(true);$("#miss").onclick=()=>mark(false);
@@ -2236,6 +2242,7 @@ document.addEventListener("keydown",e=>{
     else if(!mod&&!e.altKey&&k==="e"){e.preventDefault();pad.eraser()}
     return}
   if(tag==="textarea"||tag==="select"||tag==="input")return;
+  if(s.step===2&&(((e.metaKey||e.ctrlKey)&&!e.shiftKey&&e.key.toLowerCase()==="z")||(!e.metaKey&&!e.ctrlKey&&(e.key==="z"||e.key==="Z"||e.key==="Backspace")))){e.preventDefault();bindStep.undo&&bindStep.undo();return}
   if(s.step===2&&(e.key==="l"||e.key==="L")&&!e.metaKey&&!e.ctrlKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();S.loop=!S.loop;save();render();toast(S.loop?"Looping: passes keep going until you leave":"Loop off");return}
   if(s.step===2&&s.fc&&s.fc.pos<s.fc.order.length){
     if(e.key===" "){e.preventDefault();bindStep.flip&&bindStep.flip()}
