@@ -196,6 +196,7 @@ kbd{font:500 11px/1 var(--font);color:var(--ink-3);border:1px solid var(--line-e
 @keyframes no{0%{border-color:var(--stop)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}100%{transform:none;border-color:var(--line-edge)}}
 .btn.ok:hover{border-color:var(--go);color:var(--go)}.btn.no:hover{border-color:var(--stop);color:var(--stop)}
 .fcbar{display:flex;align-items:center;gap:var(--space-row);font-size:13px;color:var(--ink-3)}
+.loopt{font:500 12px var(--font);color:var(--ink-3);background:none;border:1px solid var(--line-edge);border-radius:6px;padding:2px 8px;cursor:pointer;transition:color var(--motion-disclosure),border-color var(--motion-disclosure)}.loopt.on{color:var(--ink);border-color:var(--ink)}
 .fcbar .track{flex:1;height:4px;border-radius:2px;background:var(--line-edge);overflow:hidden}
 .fcbar .track i{display:block;height:100%;background:var(--ink);transition:width var(--motion-disclosure)}
 .btn.ok{border-color:color-mix(in srgb,var(--success) 50%,transparent)}
@@ -2020,7 +2021,7 @@ function overview(){
   const nextSec=secs.find(s=>statusOf(s.id)==="active")||secs.find(s=>statusOf(s.id)==="new")||secs.find(s=>statusOf(s.id)==="revisit");
   const rows=secs.map((s,i)=>{const st0=statusOf(s.id),g=lastGrade(s.id);return '<li><button class="row" data-go="'+esc(s.id)+'"><span class="n num">'+(i+1)+'</span><span class="t">'+esc(s.title)+'<br><span class="meta num">'+s.cards.length+" cards, "+s.points.length+" key points"+(g===null?"":", last brain dump "+pct(g))+'</span></span><span class="chip '+st0+'">'+esc(statusLabel(s.id))+"</span></button></li>"}).join("");
   return '<div class="head"><div class="txt"><span class="eyebrow num">'+done+" of "+secs.length+' sections done</span><h2>'+esc(DECK.title)+"</h2>"+(DECK.source?'<span class="small">'+esc(DECK.source)+"</span>":"")+"</div></div>"+
-  '<section class="panel"><h3>How each section works</h3><ol class="how"><li>Read the notes for the section.</li><li>Take a brain break.</li><li>Do the flashcards, once or twice.</li><li>Take another brain break.</li><li>Brain dump: write everything you remember with the notes closed.</li><li>Mark what you missed, then loop on it or move to the next section.</li></ol>'+
+  '<section class="panel"><h3>How each section works</h3><ol class="how"><li>Read the notes for the section.</li><li>Take a brain break.</li><li>Do the flashcards. Loop them as long as you want, or do them on Quizlet and skip this step.</li><li>Take another brain break.</li><li>Brain dump: write everything you remember with the notes closed.</li><li>Mark what you missed, then loop on it or move to the next section.</li></ol>'+
   '<div class="actions">'+(nextSec?'<button class="btn primary" data-go="'+esc(nextSec.id)+'">'+(statusOf(nextSec.id)==="new"?"Start ":"Continue ")+(idx(nextSec.id)+1)+". "+esc(nextSec.title)+"</button>":'<span class="muted">Every section is done. Loop any one again to keep it fresh.</span>')+"</div>"+
   '<div class="settings"><label>Breaks <select id="bk">'+[3,5,7,10].map(v=>'<option value="'+v+'"'+(S.settings.breakMin===v?" selected":"")+">"+v+" min</option>").join("")+'</select></label><label>Brain dump goal <select id="dm">'+[5,7,10].map(v=>'<option value="'+v+'"'+(S.settings.dumpMin===v?" selected":"")+">"+v+" min</option>").join("")+'</select></label><label><input type="checkbox" id="snd"'+(S.settings.sound?" checked":"")+"> Chime when a break ends</label></div></section>"+
   '<section class="panel"><h3>Sections</h3><ul class="rows">'+rows+'</ul><div class="actions"><span class="grow"></span><button class="btn quiet" id="reset">Reset progress</button></div><div id="confirm"></div></section>';
@@ -2050,15 +2051,15 @@ function stepBreak(sec,s){
 function newPass(sec,s,which){const pool=which==="missed"&&s.fc&&s.fc.missed.length?s.fc.missed:sec.cards.map((c,i)=>i);s.fc={order:shuffle(pool),pos:0,flip:false,got:[],missed:[]};s.passes++;save()}
 function stepCards(sec,s){
   if(!s.fc){s.passes=0;newPass(sec,s,"all")}
-  const f=s.fc,quiz='<div class="quiz"><span class="small">Quizlet</span>'+(sec.quizlet?'<a class="btn" href="'+esc(sec.quizlet)+'" target="_blank" rel="noopener">Open the Quizlet set</a>':"")+'<button class="btn quiet" id="qcopy">Copy cards for Quizlet import</button><div id="qbox" style="width:100%"></div></div>';
+  const f=s.fc,quiz='<div class="quiz"><span class="small">Quizlet</span>'+(sec.quizlet?'<a class="btn" href="'+esc(sec.quizlet)+'" target="_blank" rel="noopener">Open the Quizlet set</a>':"")+'<button class="btn quiet" id="qcopy">Copy cards for Quizlet import</button><button class="btn quiet" id="qskip">Did them on Quizlet, skip</button><div id="qbox" style="width:100%"></div></div>';
   if(f.pos>=f.order.length){
     const g=f.got.length,n=f.order.length;
     return '<section class="panel"><span class="eyebrow num">Pass '+s.passes+" done</span><div class=\"tally\"><div><b class=\"okc num\">"+g+'</b><span class="small">got it</span></div><div><b class="noc num">'+f.missed.length+'</b><span class="small">missed</span></div><div><b class="num">'+n+'</b><span class="small">cards</span></div></div>'+
     (f.missed.length?'<div class="notes"><p class="muted">Missed this pass:</p><ul>'+f.missed.map(k=>"<li>"+rich(sec.cards[k][0])+"</li>").join("")+"</ul></div>":"")+
-    '<div class="actions">'+(s.passes<2?(f.missed.length?'<button class="btn" id="again-m">Second pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Second pass on all</button>':"")+'<button class="btn primary" id="go">Take a break <kbd>Enter</kbd></button></div>'+quiz+"</section>";
+    '<div class="actions">'+(f.missed.length?'<button class="btn" id="again-m">Another pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Another pass on all</button>'+'<button class="btn primary" id="go">Take a break <kbd>Enter</kbd></button></div>'+quiz+"</section>";
   }
   const c=sec.cards[f.order[f.pos]];
-  return '<section class="panel"><div class="fcbar num"><span>Pass '+s.passes+'</span><span class="track"><i style="width:'+(100*f.pos/f.order.length)+'%"></i></span><span>'+(f.pos+1)+" / "+f.order.length+'</span></div>'+
+  return '<section class="panel"><div class="fcbar num"><span>Pass '+s.passes+'</span><button class="loopt'+(S.loop?" on":"")+'" id="loopt" aria-pressed="'+(S.loop?"true":"false")+'" title="Keep shuffling new passes without stopping (L)">Loop'+(S.loop?" on":"")+'</button><span class="track"><i style="width:'+(100*f.pos/f.order.length)+'%"></i></span><span>'+(f.pos+1)+" / "+f.order.length+'</span></div>'+
   '<div class="card" id="card" role="button" tabindex="0" aria-label="Flip card"><span class="side-l">'+(f.flip?"Answer":"Term")+'</span>'+(f.flip?'<div><div class="term">'+rich(c[0])+'</div><div class="back">'+rich(c[1])+"</div></div>":'<div class="front">'+rich(c[0])+"</div>")+'<span class="hint">'+(f.flip?"":"Click or press space to flip")+'</span></div>'+
   '<div class="actions" style="justify-content:center"><button class="btn no" id="miss"'+(f.flip?"":" disabled")+'>Missed <kbd>&larr;</kbd></button><button class="btn ok" id="got"'+(f.flip?"":" disabled")+'>Got it <kbd>&rarr;</kbd></button></div>'+quiz+"</section>";
 }
@@ -2097,6 +2098,8 @@ function bindStep(sec,s){
   }
   if(s.step===2){
     const f=s.fc;
+    const qs=$("#qskip");if(qs)qs.onclick=()=>{s.quizlet=true;s.fc=null;next(sec,s)};
+    const lt=$("#loopt");if(lt)lt.onclick=()=>{S.loop=!S.loop;save();render()};
     const qc=$("#qcopy");if(qc)qc.onclick=()=>{const txt=sec.cards.map(c=>c[0]+"\t"+String(c[1]).replace(/\s*\n\s*/g," ")).join("\n");const done=()=>toast("Copied "+sec.cards.length+" cards. In Quizlet: Import, paste, Tab between term and definition.");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,()=>fallback(txt))}else fallback(txt)};
     if(f.pos>=f.order.length){
       if($("#again-m"))$("#again-m").onclick=()=>{newPass(sec,s,"missed");render()};
@@ -2107,7 +2110,9 @@ function bindStep(sec,s){
     const card=$("#card");
     const flip=()=>{f.flip=!f.flip;save();render()};
     card.onclick=flip;
-    const mark=(ok)=>{if(!f.flip)return;const k=f.order[f.pos];(ok?f.got:f.missed).push(k);f.pos++;f.flip=false;save();render();const c2=$("#card");if(c2){c2.classList.add(ok?"flash-ok":"flash-no")}};
+    const mark=(ok)=>{if(!f.flip)return;const k=f.order[f.pos];(ok?f.got:f.missed).push(k);f.pos++;f.flip=false;
+      if(S.loop&&f.pos>=f.order.length){const m=f.missed.length,g=f.got.length;newPass(sec,s,m?"missed":"all");toast(m?"Got "+g+", missed "+m+". Now just the "+m+" missed.":"Got all "+g+". Shuffling the full set again.")}
+      save();render();const c2=$("#card");if(c2){c2.classList.add(ok?"flash-ok":"flash-no")}};
     $("#got").onclick=()=>mark(true);$("#miss").onclick=()=>mark(false);
     bindStep.mark=mark;bindStep.flip=flip;
   }
@@ -2177,6 +2182,7 @@ document.addEventListener("keydown",e=>{
     else if(!mod&&!e.altKey&&k==="e"){e.preventDefault();pad.eraser()}
     return}
   if(tag==="textarea"||tag==="select"||tag==="input")return;
+  if(s.step===2&&(e.key==="l"||e.key==="L")&&!e.metaKey&&!e.ctrlKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();S.loop=!S.loop;save();render();toast(S.loop?"Looping: passes keep going until you leave":"Loop off");return}
   if(s.step===2&&s.fc&&s.fc.pos<s.fc.order.length){
     if(e.key===" "){e.preventDefault();bindStep.flip&&bindStep.flip()}
     else if(e.key==="ArrowRight"){e.preventDefault();bindStep.mark&&bindStep.mark(true)}
