@@ -1809,7 +1809,15 @@ const DECK = {
     ],
     [
      "Calculating standard deviation",
-     "Find the mean, subtract it from each value and square, add them up, divide by (n − 1), take the square root"
+     "1 mean, 2 subtract the mean from each value, 3 square each, 4 add them, 5 divide by (n − 1), 6 square root"
+    ],
+    [
+     "Standard deviation of 10.2, 10.4, 10.0, 10.6 g",
+     "0.26 g (mean 10.3, squares add to 0.20, ÷ 3 = 0.0667, √ = 0.26)"
+    ],
+    [
+     "Why square the differences?",
+     "So the negatives don't cancel out the positives"
     ],
     [
      "Which group is more precise: SD 0.02 g or 0.40 g?",
@@ -1831,7 +1839,62 @@ const DECK = {
      "key": "Percent error = |experimental − accepted| ÷ accepted × 100. Measured 2.85 with 2.70 accepted gives 0.15 ÷ 2.70 × 100 = 5.6%. Lower percent error means more accurate."
     },
     {
-     "p": "**Standard deviation** is how spread out data is from the average. A small one means precise. To calculate it: find the mean, subtract the mean from each value and square it, add those up, divide by (number of values − 1), then take the square root. If your class divided by the number of values instead, use that."
+     "p": "**Standard deviation** is how spread out data is from the average. A small one means precise."
+    },
+    {
+     "h": "Standard deviation, step by step"
+    },
+    {
+     "p": "Example: four masses, 10.2 g, 10.4 g, 10.0 g, 10.6 g."
+    },
+    {
+     "list": [
+      "**Step 1. Find the mean.** Add the values and divide by how many there are. (10.2 + 10.4 + 10.0 + 10.6) ÷ 4 = 41.2 ÷ 4 = 10.3 g",
+      "**Step 2. Subtract the mean from each value.** 10.2 − 10.3 = −0.1, 10.4 − 10.3 = 0.1, 10.0 − 10.3 = −0.3, 10.6 − 10.3 = 0.3",
+      "**Step 3. Square each difference.** This gets rid of the negatives. 0.01, 0.01, 0.09, 0.09",
+      "**Step 4. Add the squares.** 0.01 + 0.01 + 0.09 + 0.09 = 0.20",
+      "**Step 5. Divide by (number of values − 1).** 4 values, so divide by 3. 0.20 ÷ 3 = 0.0667",
+      "**Step 6. Take the square root.** √0.0667 = 0.26 g. So the standard deviation is 0.26 g."
+     ]
+    },
+    {
+     "table": {
+      "head": [
+       "Value (g)",
+       "Value − mean",
+       "Squared"
+      ],
+      "rows": [
+       [
+        "10.2",
+        "−0.1",
+        "0.01"
+       ],
+       [
+        "10.4",
+        "0.1",
+        "0.01"
+       ],
+       [
+        "10.0",
+        "−0.3",
+        "0.09"
+       ],
+       [
+        "10.6",
+        "0.3",
+        "0.09"
+       ],
+       [
+        "Mean 10.3",
+        "",
+        "Sum 0.20"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "Check: the answer can never be negative, and it should be about the size of a typical difference from the mean (here 0.1 to 0.3). If your class divides by the number of values instead of n − 1, step 5 becomes 0.20 ÷ 4 = 0.05 and the answer is 0.22 g."
     }
    ],
    "points": [
