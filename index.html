@@ -157,12 +157,17 @@ kbd{font:500 11px/1 var(--font);color:var(--ink-3);border:1px solid var(--line-e
 .btn.primary kbd{color:inherit;border-color:color-mix(in srgb,var(--on-accent) 40%,transparent)}
 
 /* Notes */
+.jogsec{display:grid;gap:6px;padding-top:var(--space-row);border-top:1px solid var(--line-inner)}.jogsec:first-of-type{border-top:0;padding-top:0}
+.jogsec h4{margin:0;font-size:15px;font-weight:600;display:flex;gap:8px;align-items:baseline}.jogsec ul{margin:0;padding-left:18px;display:grid;gap:4px;color:var(--ink-2)}
+.jogres{width:100%;border-collapse:collapse;font-size:14px}.jogres td{padding:8px 0;border-top:1px solid var(--line-inner)}.jogres td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.jogres .weak{color:var(--stop)}.jogres .ok{color:var(--go)}
+.formula{font:600 22px/1.4 var(--font);text-align:center;padding:var(--space-group) 0;letter-spacing:.01em}
 .notes{display:grid;gap:var(--space-row);max-width:72ch}
 .notes p{margin:0}
 .notes h4{margin:var(--space-inline) 0 0;font-size:15px;font-weight:600}
 .notes ul{margin:0;padding-left:20px;display:grid;gap:6px}
 .notes strong{font-weight:600}
-.key{border-left:2px solid var(--accent);padding:var(--space-inline) var(--space-row);background:var(--accent-wash);border-radius:0 var(--radius-control) var(--radius-control) 0}
+.key{white-space:pre-line;border-left:2px solid var(--accent);padding:var(--space-inline) var(--space-row);background:var(--accent-wash);border-radius:0 var(--radius-control) var(--radius-control) 0}
 .tablewrap{overflow-x:auto;border:1px solid var(--line-edge);border-radius:var(--radius-group)}
 .notes table{border-collapse:collapse;width:100%;font-size:14px}
 .notes th,.notes td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line-inner)}
@@ -1762,6 +1767,9 @@ const DECK = {
    "id": "accuracy",
    "title": "Accuracy, precision, percent error",
    "quizlet": "https://quizlet.com/1222961904/chem-unit-1-accuracy-precision-percent-error-flash-cards/",
+   "jogPin": [
+    "Standard deviation formula"
+   ],
    "cards": [
     [
      "Accuracy",
@@ -1804,6 +1812,10 @@ const DECK = {
      "More accurate"
     ],
     [
+     "Standard deviation formula",
+     "s = √( Σ(x − x̄)² ÷ (n − 1) )"
+    ],
+    [
      "Standard deviation",
      "How spread out data is from the average. Small = precise."
     ],
@@ -1822,6 +1834,22 @@ const DECK = {
     [
      "Which group is more precise: SD 0.02 g or 0.40 g?",
      "0.02 g, because a smaller standard deviation means less spread"
+    ],
+    [
+     "In the SD formula, what is x̄?",
+     "The mean (x bar)"
+    ],
+    [
+     "In the SD formula, what does Σ mean?",
+     "Add them all up (sigma, the sum)"
+    ],
+    [
+     "In the SD formula, what is n?",
+     "How many values there are"
+    ],
+    [
+     "Many Monkeys Swing Slowly Down Ropes",
+     "Mean, Minus, Square, Sum, Divide by n − 1, Root (the SD formula from the inside out)"
     ]
    ],
    "notes": [
@@ -1840,6 +1868,15 @@ const DECK = {
     },
     {
      "p": "**Standard deviation** is how spread out data is from the average. A small one means precise."
+    },
+    {
+     "h": "The formula to memorize"
+    },
+    {
+     "formula": "s = √( Σ(x − x̄)² ÷ (n − 1) )"
+    },
+    {
+     "key": "s = standard deviation. x = each value. x̄ (x bar) = the mean. Σ (sigma) = add them all up. n = how many values.\n\nRead it from the inside out, and it is the six steps in order: **Many Monkeys Swing Slowly Down Ropes** = Mean, Minus, Square, Sum, Divide by n − 1, Root."
     },
     {
      "h": "Standard deviation, step by step"
@@ -1904,6 +1941,7 @@ const DECK = {
     "Percent error = |experimental − accepted| ÷ accepted × 100",
     "Lower percent error means more accurate",
     "Standard deviation is spread from the average, small means precise",
+    "The standard deviation formula: s = √( Σ(x − x̄)² ÷ (n − 1) ), Many Monkeys Swing Slowly Down Ropes",
     "The standard deviation steps: mean, subtract and square, add, divide by n − 1, square root"
    ]
   },
@@ -2075,9 +2113,9 @@ function renderSide(){
   const list='<ul class="secs">'+secs.map((s,i)=>{const g=lastGrade(s.id);return '<li><button class="sec" data-go="'+esc(s.id)+'" aria-current="'+(S.cur===s.id)+'"><span class="n num">'+(i+1)+'</span><span class="t">'+esc(s.title)+'</span><span class="pct num" title="Last brain dump">'+(g===null?"":pct(g))+'</span><span class="dot '+statusOf(s.id)+'" title="'+esc(statusLabel(s.id))+'"></span></button></li>'}).join("")+"</ul>";
   const o=overall(),done=secs.filter(s=>statusOf(s.id)==="done").length;
   const prog='<div class="prog"><span class="small">Remembered</span><div class="big"><b class="num">'+(o.n?pct(o.avg):"0%")+'</b><span class="small num">'+(o.n?"average of "+o.n+" marked":"nothing marked yet")+'</span></div><div class="bar3"><i style="width:'+(o.n?o.avg*100:0)+'%"></i></div><div class="row2"><span class="small num">'+done+" of "+secs.length+' done</span><span class="grow" style="flex:1"></span><button class="btn quiet" id="resetall">Reset all</button></div><div id="rconf"></div></div>';
-  const over='<button class="sec" data-go="" aria-current="'+(S.cur===null)+'"><span class="n">&#8962;</span><span class="t">Overview</span><span></span></button>';
+  const over='<button class="sec" data-go="" aria-current="'+(S.cur===null)+'"><span class="n">&#8962;</span><span class="t">Overview</span><span></span></button><button class="sec" data-go="jog" aria-current="'+(S.cur==="jog")+'"><span class="n">&#8635;</span><span class="t">Memory jog</span><span></span></button>';
   const narrow=matchMedia("(max-width:860px)").matches;
-  if(narrow){const cur=S.cur?(idx(S.cur)+1)+". "+secById(S.cur).title:"Overview";
+  if(narrow){const cur=S.cur==="jog"?"Memory jog":S.cur?(idx(S.cur)+1)+". "+secById(S.cur).title:"Overview";
     $("#side").innerHTML='<details id="secdd"><summary><span>'+esc(cur)+'</span><span class="small num">'+(o.n?pct(o.avg)+" remembered ":"")+'<span class="chev">&#8250;</span></span></summary><div style="padding:0 6px 6px">'+prog+'<div class="secs">'+over+"</div>"+list+"</div></details>";}
   else $("#side").innerHTML=prog+'<div class="secs" style="margin-bottom:12px">'+over+'</div><p class="label">Sections</p>'+list;
   const ra=$("#resetall");if(ra)ra.onclick=()=>{$("#rconf").innerHTML='<div class="confirm" style="padding:8px 10px"><span class="small">Clear every grade, round, brain dump and sketch?</span><button class="btn" id="rano">Keep</button><button class="btn" id="rayes" style="border-color:var(--stop);color:var(--stop)">Reset all</button></div>';$("#rano").onclick=()=>$("#rconf").innerHTML="";$("#rayes").onclick=resetAll};
@@ -2095,6 +2133,7 @@ function notesHTML(blocks){
   return blocks.map(b=>{
     if(b.h)return "<h4>"+rich(b.h)+"</h4>";
     if(b.p)return "<p>"+rich(b.p)+"</p>";
+    if(b.formula)return '<p class="formula">'+rich(b.formula)+"</p>";
     if(b.key)return '<p class="key">'+rich(b.key)+"</p>";
     if(b.list)return "<ul>"+b.list.map(x=>"<li>"+rich(x)+"</li>").join("")+"</ul>";
     if(b.table){const t=b.table;return '<div class="tablewrap"><table><thead><tr>'+t.head.map(h=>"<th>"+rich(h)+"</th>").join("")+"</tr></thead><tbody>"+t.rows.map(r=>r.length===1?'<tr><td class="group" colspan="'+t.head.length+'">'+rich(r[0])+"</td></tr>":"<tr>"+r.map(c=>"<td>"+rich(c)+"</td>").join("")+"</tr>").join("")+"</tbody></table></div>"}
@@ -2113,12 +2152,13 @@ function header(sec,s){
 
 function render(){
   clearInterval(tick);tick=null;cancelAnimationFrame(raf);raf=0;pad=null;
-  const key=S.cur?S.cur+":"+st(S.cur).step:null;
+  const key=S.cur&&S.cur!=="jog"?S.cur+":"+st(S.cur).step:null;
   if(liveKey&&liveKey!==key)delete clocks[liveKey];
   liveKey=key;
   renderBar();renderSide();
   const m=$("#main");
   if(!S.cur){m.innerHTML=overview();bindOverview();return}
+  if(S.cur==="jog"){m.innerHTML=jogView();bindJog();return}
   const sec=secById(S.cur);if(!sec){S.cur=null;return render()}
   const s=st(sec.id);
   if(!secSteps(sec).includes(s.step)){s.step=secSteps(sec).find(k=>k>s.step)??lastStep(sec);save()}
@@ -2143,7 +2183,7 @@ function setClock(el,str){if(!el)return;const cur=[...el.querySelectorAll(".d")]
 function dialSVG(r,id,head){return '<svg viewBox="0 0 '+(2*r+12)+" "+(2*r+12)+'" aria-hidden="true"><circle class="dial-track" cx="'+(r+6)+'" cy="'+(r+6)+'" r="'+r+'"/><circle class="dial-arc" id="'+id+'" cx="'+(r+6)+'" cy="'+(r+6)+'" r="'+r+'" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="0"/>'+(head?'<circle class="dial-head" id="'+id+'h" r="5" cx="'+(2*r+6)+'" cy="'+(r+6)+'"/>':"")+"</svg>"}
 function setDial(id,frac,r){const a=document.getElementById(id);if(!a)return;frac=Math.max(0,Math.min(1,frac));a.setAttribute("stroke-dashoffset",String(1-frac));const h=document.getElementById(id+"h");if(h){const ang=frac*2*Math.PI;h.setAttribute("cx",(r+6+r*Math.cos(ang)).toFixed(2));h.setAttribute("cy",(r+6+r*Math.sin(ang)).toFixed(2));h.style.opacity=frac>0?1:0}}
 
-function go(id){S.cur=id||null;if(id){const s=st(id);if(s.status==="new"||s.status==="revisit"){if(s.status==="revisit"){s.status="active";}else s.status="active"}}save();render();scrollTo({top:0,behavior:"smooth"})}
+function go(id){if(id==="jog"){S.cur="jog";save();render();scrollTo({top:0,behavior:"smooth"});return}S.cur=id||null;if(id){const s=st(id);if(s.status==="new"||s.status==="revisit"){if(s.status==="revisit"){s.status="active";}else s.status="active"}}save();render();scrollTo({top:0,behavior:"smooth"})}
 function finishSec(sec,s){UNDO=[];s.status="done";s.focus=[];s.step=0;s.round=1;s.got={};s.fc=null;const n=nextNew(sec);save();toast("Section "+(idx(sec.id)+1)+" done");go(n?n.id:null)}
 function next(sec,s){if(s.step>=lastStep(sec))return finishSec(sec,s);UNDO=[];const a=secSteps(sec);s.step=a[a.indexOf(s.step)+1]??s.step+1;if(s.step===2){s.fc=null}save();render();scrollTo({top:0,behavior:"smooth"})}
 
@@ -2154,7 +2194,7 @@ function overview(){
   const rows=secs.map((s,i)=>{const st0=statusOf(s.id),g=lastGrade(s.id);return '<li><button class="row" data-go="'+esc(s.id)+'"><span class="n num">'+(i+1)+'</span><span class="t">'+esc(s.title)+'<br><span class="meta num">'+s.cards.length+" cards"+(secSteps(s).includes(5)?", "+s.points.length+" key points":", flashcards only")+(g===null?"":", last brain dump "+pct(g))+'</span></span><span class="chip '+st0+'">'+esc(statusLabel(s.id))+"</span></button></li>"}).join("");
   return '<div class="head"><div class="txt"><span class="eyebrow num">'+done+" of "+secs.length+' sections done</span><h2>'+esc(DECK.title)+"</h2>"+(DECK.source?'<span class="small">'+esc(DECK.source)+"</span>":"")+"</div></div>"+
   '<section class="panel"><h3>How each section works</h3><ol class="how"><li>Read the notes for the section.</li><li>Take a brain break.</li><li>Do the flashcards. Loop them as long as you want, or do them on Quizlet and skip this step.</li><li>Take another brain break.</li><li>Brain dump: write everything you remember with the notes closed.</li><li>Mark what you missed, then loop on it or move to the next section.</li></ol>'+
-  '<div class="actions">'+(nextSec?'<button class="btn primary" data-go="'+esc(nextSec.id)+'">'+(statusOf(nextSec.id)==="new"?"Start ":"Continue ")+(idx(nextSec.id)+1)+". "+esc(nextSec.title)+"</button>":'<span class="muted">Every section is done. Loop any one again to keep it fresh.</span>')+"</div>"+
+  '<div class="actions"><button class="btn" data-go="jog">Memory jog, every topic fast</button>'+(nextSec?'<button class="btn primary" data-go="'+esc(nextSec.id)+'">'+(statusOf(nextSec.id)==="new"?"Start ":"Continue ")+(idx(nextSec.id)+1)+". "+esc(nextSec.title)+"</button>":'<span class="muted">Every section is done. Loop any one again to keep it fresh.</span>')+"</div>"+
   '<div class="settings"><label>Breaks <select id="bk">'+[3,5,7,10].map(v=>'<option value="'+v+'"'+(S.settings.breakMin===v?" selected":"")+">"+v+" min</option>").join("")+'</select></label><label>Brain dump goal <select id="dm">'+[5,7,10].map(v=>'<option value="'+v+'"'+(S.settings.dumpMin===v?" selected":"")+">"+v+" min</option>").join("")+'</select></label><label><input type="checkbox" id="snd"'+(S.settings.sound?" checked":"")+"> Chime when a break ends</label></div></section>"+
   '<section class="panel"><h3>Sections</h3><ul class="rows">'+rows+'</ul><div class="actions"><span class="grow"></span><button class="btn quiet" id="reset">Reset progress</button></div><div id="confirm"></div></section>';
 }
@@ -2192,6 +2232,55 @@ function sidePicker(sec){const hasPic=sec.cards.some(c=>c[2]),sd=sides();
   const row=w=>'<span class="sp"><span class="small">'+(w==="front"?"Front":"Back")+'</span>'+PARTS.filter(x=>x[0]!=="pic"||hasPic).map(x=>'<button class="loopt'+(sd[w].includes(x[0])?" on":"")+'" data-side="'+w+'" data-part="'+x[0]+'" aria-pressed="'+sd[w].includes(x[0])+'">'+x[1]+"</button>").join("")+"</span>";
   return '<div class="sides">'+row("front")+row("back")+"</div>"}
 function newPass(sec,s,which){const pool=which==="missed"&&s.fc&&s.fc.missed.length?s.fc.missed:sec.cards.map((c,i)=>i);s.fc={order:shuffle(pool),pos:0,flip:false,got:[],missed:[]};s.passes++;save()}
+/* Memory jog: one fast pass over every topic, separate from the section loop */
+let J={mode:"menu",per:4,cards:[],pos:0,flip:false,res:[],hist:[]};
+function jogBuild(per,only){const out=[];secs.forEach(sec=>{const pin=(sec.jogPin||[]).map(f=>sec.cards.findIndex(c=>c[0]===f)).filter(i=>i>=0);
+  let pool=only?only.filter(x=>x[0]===sec.id).map(x=>x[1]):sec.cards.map((c,i)=>i);if(!pool.length)return;
+  let pick=only?pool:pin.concat(shuffle(pool.filter(i=>!pin.includes(i)))).slice(0,Math.max(per,pin.length));
+  shuffle(pick).forEach(k=>out.push([sec.id,k]))});return out}
+function jogStart(only){J={mode:"quiz",per:J.per,cards:jogBuild(J.per,only),pos:0,flip:false,res:[],hist:[]};render()}
+function jogView(){
+  const head='<div class="head"><div class="txt"><span class="eyebrow">All '+secs.length+' topics</span><h2>Memory jog</h2><span class="small">A fast pass over everything, outside the section loop. Use it to warm up, or the morning of the test.</span></div></div>';
+  if(J.mode==="menu"){const last=S.jogLast;
+    return head+'<section class="panel"><h3>Pick a jog</h3><div class="notes"><p><strong>Quick read.</strong> Every key point from every topic on one page. About 5 minutes.</p><p><strong>Quick quiz.</strong> A few flashcards from each topic, in topic order, then a score for each topic so you see what to go back to.</p></div>'+
+    '<div class="settings"><label>Cards per topic <select id="jper">'+[3,4,6,8].map(v=>'<option value="'+v+'"'+(J.per===v?" selected":"")+">"+v+"</option>").join("")+"</select></label></div>"+
+    '<div class="actions"><button class="btn" id="jread">Quick read</button><button class="btn primary" id="jquiz">Quick quiz <kbd>Enter</kbd></button></div>'+(last?'<p class="small" style="margin:0">Last quiz '+esc(last.date)+": "+last.got+" of "+last.total+" ("+pct(last.got/last.total)+")</p>":"")+"</section>"}
+  if(J.mode==="read"){return head+'<section class="panel"><h3>Every key point</h3>'+secs.map((sec,i)=>'<div class="jogsec"><h4><span class="num small">'+(i+1)+"</span>"+esc(sec.title)+"</h4><ul>"+sec.points.map(p=>"<li>"+rich(p)+"</li>").join("")+"</ul></div>").join("")+
+    '<div class="actions"><button class="btn quiet" id="jback">Back</button><span class="grow"></span><button class="btn primary" id="jquiz">Now the quick quiz</button></div></section>'}
+  if(J.mode==="quiz"&&J.pos<J.cards.length){const [sid,k]=J.cards[J.pos],sec=secById(sid),c=sec.cards[k],sd=sides(),pp=sd[J.flip?"back":"front"],only=c[2]&&pp.length===1&&pp[0]==="pic";
+    return head+'<section class="panel"><div class="fcbar num"><span>'+(idx(sid)+1)+". "+esc(sec.title)+'</span><span class="track"><i style="width:'+(100*J.pos/J.cards.length)+'%"></i></span><span>'+(J.pos+1)+" / "+J.cards.length+"</span></div>"+
+    '<div class="card" id="card" role="button" tabindex="0" aria-label="Flip card">'+(only?"":'<span class="side-l">'+(J.flip?"Back":"Front")+"</span>")+face(c,pp)+(J.flip||only?"":'<span class="hint">Click or press space to flip</span>')+"</div>"+
+    '<div class="actions" style="justify-content:center"><button class="btn quiet" id="jundo"'+(J.hist.length?"":" disabled")+'>Undo <kbd>&#8984;Z</kbd></button><button class="btn no" id="jmiss"'+(J.flip?"":" disabled")+'>Missed <kbd>&larr;</kbd></button><button class="btn ok" id="jgot"'+(J.flip?"":" disabled")+'>Got it <kbd>&rarr;</kbd></button></div>'+
+    '<div class="actions"><button class="btn quiet" id="jstop">Stop and see results</button></div></section>'}
+  const by={};J.res.forEach(([sid,k,ok])=>{const b=by[sid]=by[sid]||[0,0];b[1]++;if(ok)b[0]++});
+  const rows=secs.filter(s=>by[s.id]).map(s=>({s,g:by[s.id][0],n:by[s.id][1]})).sort((a,b)=>a.g/a.n-b.g/b.n);
+  const got=J.res.filter(r=>r[2]).length,miss=J.res.filter(r=>!r[2]);
+  return head+'<section class="panel"><h3>'+got+" of "+J.res.length+" ("+pct(J.res.length?got/J.res.length:0)+')</h3><p class="small" style="margin:0">Weakest topics first. Click one to go study it.</p><table class="jogres">'+
+    rows.map(r=>'<tr><td><button class="btn quiet" data-go="'+esc(r.s.id)+'" style="padding:0">'+(idx(r.s.id)+1)+". "+esc(r.s.title)+'</button></td><td class="'+(r.g/r.n<.75?"weak":r.g===r.n?"ok":"")+'">'+r.g+" / "+r.n+"</td></tr>").join("")+"</table>"+
+    '<div class="actions"><button class="btn quiet" id="jundo"'+(J.hist.length?"":" disabled")+'>Undo <kbd>&#8984;Z</kbd></button><span class="grow"></span>'+(miss.length?'<button class="btn" id="jmissed">Redo the '+miss.length+" missed</button>":"")+'<button class="btn primary" id="jagain">New jog</button></div></section>';
+}
+function jogMark(ok){if(!J.flip)return;J.hist.push(JSON.stringify({pos:J.pos,res:J.res}));const [sid,k]=J.cards[J.pos];J.res.push([sid,k,ok]);J.pos++;J.flip=false;
+  if(J.pos>=J.cards.length){const got=J.res.filter(r=>r[2]).length;S.jogLast={date:new Date().toLocaleDateString(),got,total:J.res.length};save()}
+  render();const c=$("#card");if(c)c.classList.add(ok?"flash-ok":"flash-no")}
+function jogUndo(){if(!J.hist.length)return;const h=JSON.parse(J.hist.pop());J.pos=h.pos;J.res=h.res;J.mode="quiz";J.flip=true;render()}
+function bindJog(){
+  const on=(id,f)=>{const el=$("#"+id);if(el)el.onclick=f};
+  on("jread",()=>{J.mode="read";render();scrollTo({top:0})});on("jback",()=>{J.mode="menu";render()});
+  on("jquiz",()=>jogStart());on("jagain",()=>{J.mode="menu";render()});
+  on("jmissed",()=>jogStart(J.res.filter(r=>!r[2]).map(r=>[r[0],r[1]])));
+  on("jundo",jogUndo);on("jgot",()=>jogMark(true));on("jmiss",()=>jogMark(false));
+  on("jstop",()=>{J.cards=J.cards.slice(0,J.pos);render()});
+  on("card",()=>{J.flip=!J.flip;render()});
+  const sel=$("#jper");if(sel)sel.onchange=e=>{J.per=+e.target.value};
+  document.querySelectorAll("#main [data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+function jogKey(e){const tag=(e.target.tagName||"").toLowerCase();if(tag==="select"||tag==="input"||tag==="textarea")return;
+  if(((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="z")||(!e.metaKey&&!e.ctrlKey&&(e.key==="z"||e.key==="Backspace"))){e.preventDefault();return jogUndo()}
+  if(J.mode==="menu"&&e.key==="Enter"&&tag!=="button"){e.preventDefault();return jogStart()}
+  if(J.mode!=="quiz"||J.pos>=J.cards.length)return;
+  if(e.key===" "){e.preventDefault();J.flip=!J.flip;render()}
+  else if(e.key==="ArrowRight"){e.preventDefault();jogMark(true)}
+  else if(e.key==="ArrowLeft"){e.preventDefault();jogMark(false)}}
 function stepCards(sec,s){
   if(!s.fc){s.passes=0;newPass(sec,s,"all")}
   const f=s.fc,quiz='<div class="quiz"><span class="small">Quizlet</span>'+(sec.quizlet?'<a class="btn" href="'+esc(sec.quizlet)+'" target="_blank" rel="noopener">Open the Quizlet set</a>':"")+'<button class="btn quiet" id="qcopy">Copy cards for Quizlet import</button><button class="btn quiet" id="qskip">Did them on Quizlet, skip</button><div id="qbox" style="width:100%"></div></div>';
@@ -2318,7 +2407,7 @@ function fallback(txt){const box=$("#qbox");if(!box)return;box.innerHTML='<texta
 
 document.addEventListener("click",e=>{const b=e.target.closest("#side [data-go]");if(b)go(b.dataset.go)});
 document.addEventListener("keydown",e=>{
-  if(!S.cur)return;const s=st(S.cur);const tag=(e.target.tagName||"").toLowerCase();
+  if(!S.cur)return;if(S.cur==="jog"){jogKey(e);return}const s=st(S.cur);const tag=(e.target.tagName||"").toLowerCase();
   if(s.step===4){const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
     if(e.key==="Enter"&&mod){e.preventDefault();$("#go").click();return}
     if(tag==="textarea"||tag==="input"||tag==="select"||!pad)return;
