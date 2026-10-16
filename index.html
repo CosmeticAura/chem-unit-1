@@ -157,6 +157,7 @@ kbd{font:500 11px/1 var(--font);color:var(--ink-3);border:1px solid var(--line-e
 .btn.primary kbd{color:inherit;border-color:color-mix(in srgb,var(--on-accent) 40%,transparent)}
 
 /* Notes */
+.must{margin:0;padding-left:18px;display:grid;gap:6px}
 .jogsec{display:grid;gap:6px;padding-top:var(--space-row);border-top:1px solid var(--line-inner)}.jogsec:first-of-type{border-top:0;padding-top:0}
 .jogsec h4{margin:0;font-size:15px;font-weight:600;display:flex;gap:8px;align-items:baseline}.jogsec ul{margin:0;padding-left:18px;display:grid;gap:4px;color:var(--ink-2)}
 .jogres{width:100%;border-collapse:collapse;font-size:14px}.jogres td{padding:8px 0;border-top:1px solid var(--line-inner)}.jogres td:last-child{text-align:right;font-variant-numeric:tabular-nums}
@@ -291,6 +292,79 @@ textarea.dump:focus{outline:none;border-color:var(--accent-focus)}
 <script>
 /* DECK_START */
 const DECK = {
+ "review": {
+  "must": [
+   "**Density** = mass ÷ volume (g/mL or g/cm³)",
+   "**Percent error** = |experimental − accepted| ÷ accepted × 100",
+   "**Standard deviation** s = √( Σ(x − x̄)² ÷ (n − 1) ). Many Monkeys Swing Slowly Down Ropes: Mean, Minus, Square, Sum, Divide, Root",
+   "**Prefixes:** Mister King Henry Died By Drinking Chocolate Milk, Microwaved (mega, kilo, hecto, deka, base, deci, centi, milli, micro)",
+   "**Sig figs:** Atlantic Pacific. Decimal Present, start left. Absent, start right",
+   "**Graphs:** DRY MIX. Dependent Responding Y, Manipulated Independent X",
+   "**Separation:** My Friend Dave Found Every Cool Dinosaur Coin Ever",
+   "**°C to K:** add 273. **1 mL = 1 cm³**"
+  ],
+  "secs": {
+   "classification": [
+    "Matter → **pure substance** (one kind of particle) or **mixture** (physically combined)",
+    "Pure → **element** (one kind of atom) or **compound** (atoms chemically joined, only a chemical change splits it)",
+    "Mixture → **homogeneous** (same throughout, solutions like salt water) or **heterogeneous** (you can see the parts)",
+    "Particle diagrams: count kinds of particles first. One kind = pure, two or more = mixture"
+   ],
+   "properties": [
+    "**Physical** property: seen without changing it (color, density, melting point). **Chemical**: how it reacts (flammability, ability to rust)",
+    "**Physical change**: no new substance (melt, cut, dissolve). **Chemical change**: new substance (burn, rust, bake)",
+    "Evidence of a chemical change: gas, color change, precipitate, temperature change or light, new odor. Proof is a new substance"
+   ],
+   "states": [
+    "Solid: fixed shape and volume. Liquid: fixed volume, takes the shape. Gas: fills the container",
+    "Melting, freezing, evaporation/boiling, condensation, **sublimation** (solid → gas), **deposition** (gas → solid). All physical",
+    "Water's heating curve is flat at 0 °C and 100 °C: the energy changes the state, not the temperature"
+   ],
+   "separation": [
+    "Magnet, Filtration, Decantation, Flotation, Evaporation, Crystallization, Distillation, Chromatography, Electrolysis",
+    "All physical except **electrolysis** (chemical, splits water into hydrogen and oxygen)",
+    "Filtration: residue stays, filtrate goes through. Evaporation keeps the solid, distillation keeps the liquid",
+    "Iron, sand and salt: magnet, add water and filter, evaporate"
+   ],
+   "lab": [
+    "Beaker: rough volume. Graduated cylinder: accurate, read the bottom of the meniscus at eye level",
+    "Volumetric flask: one exact volume. Buret: adds an exact amount. Balance: tare first",
+    "Bunsen burner lit with a flint striker. Glowing splint relights in oxygen, burning one pops in hydrogen",
+    "Safety: goggles, hair tied back, never taste, waft, point test tubes away, report spills"
+   ],
+   "metric": [
+    "mega 1,000,000 · kilo 1000 · hecto 100 · deka 10 · base 1 · deci 0.1 · centi 0.01 · milli 0.001 · micro 0.000001",
+    "Ladder: down to a smaller unit, decimal moves right. Mega↔kilo and milli↔micro are 3 places",
+    "Dimensional analysis: unit you want on top, unit to cancel on the bottom. 2.5 km × (1000 m / 1 km) = 2500 m",
+    "SI units: kilogram, meter, cubic meter, Kelvin, joule"
+   ],
+   "scinot": [
+    "A × 10ⁿ with 1 ≤ A < 10. Big numbers positive exponent, small numbers negative",
+    "45,000 = 4.5 × 10⁴. 0.0032 = 3.2 × 10⁻³",
+    "Multiply: multiply A's, add exponents. Divide: divide A's, subtract exponents. Fix A if it's 10 or more"
+   ],
+   "sigfigs": [
+    "Count from the first nonzero digit (Atlantic Pacific). Zeros in between count",
+    "× ÷: fewest sig figs. + −: fewest decimal places. Round once at the end",
+    "Measuring: all certain digits plus one estimated digit"
+   ],
+   "density": [
+    "D = m ÷ V. 20 g ÷ 5 cm³ = 4 g/cm³",
+    "Water displacement: volume = final − starting level. 45.0 g rock, 15.0 mL → 3.00 g/mL",
+    "Water is 1 g/mL: less dense floats, more dense sinks. Always write units"
+   ],
+   "accuracy": [
+    "**Accuracy**: close to the true value. **Precision**: close to each other",
+    "Percent error: 2.85 measured, 2.70 accepted → 0.15 ÷ 2.70 × 100 = 5.6%. Lower = more accurate",
+    "Standard deviation: small = precise. 10.2, 10.4, 10.0, 10.6 g → mean 10.3, squares sum 0.20, ÷ 3, √ = 0.26 g"
+   ],
+   "graphs": [
+    "Line: change over time. Bar: categories. Pie: parts of a whole. Scatter: two measured variables",
+    "IV changed on purpose, x axis. DV measured, y axis. Controlled variables stay the same",
+    "Complete graph: title (DV vs IV), axes with units, even scales. Slope = Δy ÷ Δx with units"
+   ]
+  }
+ },
  "title": "Chemistry unit 1",
  "subtitle": "Test Friday, Oct 16",
  "source": "From your study guide doc, sections 1 to 11",
@@ -2233,20 +2307,18 @@ function sidePicker(sec){const hasPic=sec.cards.some(c=>c[2]),sd=sides();
   return '<div class="sides">'+row("front")+row("back")+"</div>"}
 function newPass(sec,s,which){const pool=which==="missed"&&s.fc&&s.fc.missed.length?s.fc.missed:sec.cards.map((c,i)=>i);s.fc={order:shuffle(pool),pos:0,flip:false,got:[],missed:[]};s.passes++;save()}
 /* Memory jog: one fast pass over every topic, separate from the section loop */
-let J={mode:"menu",per:4,cards:[],pos:0,flip:false,res:[],hist:[]};
+let J={mode:"review",per:4,cards:[],pos:0,flip:false,res:[],hist:[]};
 function jogBuild(per,only){const out=[];secs.forEach(sec=>{const pin=(sec.jogPin||[]).map(f=>sec.cards.findIndex(c=>c[0]===f)).filter(i=>i>=0);
   let pool=only?only.filter(x=>x[0]===sec.id).map(x=>x[1]):sec.cards.map((c,i)=>i);if(!pool.length)return;
   let pick=only?pool:pin.concat(shuffle(pool.filter(i=>!pin.includes(i)))).slice(0,Math.max(per,pin.length));
   shuffle(pick).forEach(k=>out.push([sec.id,k]))});return out}
 function jogStart(only){J={mode:"quiz",per:J.per,cards:jogBuild(J.per,only),pos:0,flip:false,res:[],hist:[]};render()}
 function jogView(){
-  const head='<div class="head"><div class="txt"><span class="eyebrow">All '+secs.length+' topics</span><h2>Memory jog</h2><span class="small">A fast pass over everything, outside the section loop. Use it to warm up, or the morning of the test.</span></div></div>';
-  if(J.mode==="menu"){const last=S.jogLast;
-    return head+'<section class="panel"><h3>Pick a jog</h3><div class="notes"><p><strong>Quick read.</strong> Every key point from every topic on one page. About 5 minutes.</p><p><strong>Quick quiz.</strong> A few flashcards from each topic, in topic order, then a score for each topic so you see what to go back to.</p></div>'+
-    '<div class="settings"><label>Cards per topic <select id="jper">'+[3,4,6,8].map(v=>'<option value="'+v+'"'+(J.per===v?" selected":"")+">"+v+"</option>").join("")+"</select></label></div>"+
-    '<div class="actions"><button class="btn" id="jread">Quick read</button><button class="btn primary" id="jquiz">Quick quiz <kbd>Enter</kbd></button></div>'+(last?'<p class="small" style="margin:0">Last quiz '+esc(last.date)+": "+last.got+" of "+last.total+" ("+pct(last.got/last.total)+")</p>":"")+"</section>"}
-  if(J.mode==="read"){return head+'<section class="panel"><h3>Every key point</h3>'+secs.map((sec,i)=>'<div class="jogsec"><h4><span class="num small">'+(i+1)+"</span>"+esc(sec.title)+"</h4><ul>"+sec.points.map(p=>"<li>"+rich(p)+"</li>").join("")+"</ul></div>").join("")+
-    '<div class="actions"><button class="btn quiet" id="jback">Back</button><span class="grow"></span><button class="btn primary" id="jquiz">Now the quick quiz</button></div></section>'}
+  const head='<div class="head"><div class="txt"><span class="eyebrow">All '+secs.length+' topics</span><h2>Memory jog</h2><span class="small">A short review of everything on one page. About 5 minutes.</span></div></div>';
+  if(J.mode!=="quiz"){const last=S.jogLast,R=DECK.review||{must:[],secs:{}};
+    return head+'<section class="panel"><h3>Must memorize</h3><ul class="must">'+(R.must||[]).map(m=>"<li>"+rich(m)+"</li>").join("")+"</ul></section>"+
+    '<section class="panel">'+secs.map((sec,i)=>'<div class="jogsec"><h4><span class="num small">'+(i+1)+"</span>"+esc(sec.title)+"</h4><ul>"+((R.secs||{})[sec.id]||sec.points).map(p=>"<li>"+rich(p)+"</li>").join("")+"</ul></div>").join("")+"</section>"+
+    '<section class="panel"><h3>Then test yourself</h3><p class="small" style="margin:0">A few flashcards from every topic, then a score for each one so you know what to look at again.</p><div class="settings"><label>Cards per topic <select id="jper">'+[3,4,6,8].map(v=>'<option value="'+v+'"'+(J.per===v?" selected":"")+">"+v+"</option>").join("")+'</select></label></div><div class="actions"><button class="btn primary" id="jquiz">Quiz me on everything</button></div>'+(last?'<p class="small" style="margin:0">Last quiz '+esc(last.date)+": "+last.got+" of "+last.total+" ("+pct(last.got/last.total)+")</p>":"")+"</section>"}
   if(J.mode==="quiz"&&J.pos<J.cards.length){const [sid,k]=J.cards[J.pos],sec=secById(sid),c=sec.cards[k],sd=sides(),pp=sd[J.flip?"back":"front"],only=c[2]&&pp.length===1&&pp[0]==="pic";
     return head+'<section class="panel"><div class="fcbar num"><span>'+(idx(sid)+1)+". "+esc(sec.title)+'</span><span class="track"><i style="width:'+(100*J.pos/J.cards.length)+'%"></i></span><span>'+(J.pos+1)+" / "+J.cards.length+"</span></div>"+
     '<div class="card" id="card" role="button" tabindex="0" aria-label="Flip card">'+(only?"":'<span class="side-l">'+(J.flip?"Back":"Front")+"</span>")+face(c,pp)+(J.flip||only?"":'<span class="hint">Click or press space to flip</span>')+"</div>"+
@@ -2266,7 +2338,7 @@ function jogUndo(){if(!J.hist.length)return;const h=JSON.parse(J.hist.pop());J.p
 function bindJog(){
   const on=(id,f)=>{const el=$("#"+id);if(el)el.onclick=f};
   on("jread",()=>{J.mode="read";render();scrollTo({top:0})});on("jback",()=>{J.mode="menu";render()});
-  on("jquiz",()=>jogStart());on("jagain",()=>{J.mode="menu";render()});
+  on("jquiz",()=>jogStart());on("jagain",()=>{J.mode="review";render();scrollTo({top:0})});
   on("jmissed",()=>jogStart(J.res.filter(r=>!r[2]).map(r=>[r[0],r[1]])));
   on("jundo",jogUndo);on("jgot",()=>jogMark(true));on("jmiss",()=>jogMark(false));
   on("jstop",()=>{J.cards=J.cards.slice(0,J.pos);render()});
@@ -2276,7 +2348,6 @@ function bindJog(){
 }
 function jogKey(e){const tag=(e.target.tagName||"").toLowerCase();if(tag==="select"||tag==="input"||tag==="textarea")return;
   if(((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="z")||(!e.metaKey&&!e.ctrlKey&&(e.key==="z"||e.key==="Backspace"))){e.preventDefault();return jogUndo()}
-  if(J.mode==="menu"&&e.key==="Enter"&&tag!=="button"){e.preventDefault();return jogStart()}
   if(J.mode!=="quiz"||J.pos>=J.cards.length)return;
   if(e.key===" "){e.preventDefault();J.flip=!J.flip;render()}
   else if(e.key==="ArrowRight"){e.preventDefault();jogMark(true)}
