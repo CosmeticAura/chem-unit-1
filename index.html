@@ -853,6 +853,11 @@ const DECK = {
    "id": "lab",
    "title": "Lab tools and safety",
    "quizlet": "https://quizlet.com/1222746713/chem-unit-1-lab-tools-and-safety-flash-cards/",
+   "steps": [
+    0,
+    1,
+    2
+   ],
    "cards": [
     [
      "Beaker",
@@ -1945,6 +1950,9 @@ const DECK = {
 (function(){
 "use strict";
 const STEPS=["Read","Break","Flashcards","Break","Brain dump","Mark"];
+/* A section can use only some of the steps, for example read, break and flashcards for one where a brain dump makes no sense */
+const secSteps=sec=>sec&&sec.steps&&sec.steps.length?sec.steps:[0,1,2,3,4,5];
+const lastStep=sec=>{const a=secSteps(sec);return a[a.length-1]};
 const KEY="studyloop:"+DECK.title;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -2000,11 +2008,11 @@ function renderSide(){
 }
 function resetAll(){const snd=S.settings;S=blank();S.settings=snd;for(const k in clocks)delete clocks[k];for(const k in hist)delete hist[k];save();render();toast("Progress reset")}
 
-function ring(step,round){
-  const R=40,c=56,nodes=STEPS.map((n,i)=>{const a=-Math.PI/2+i*2*Math.PI/6;return [c+R*Math.cos(a),c+R*Math.sin(a)]});
-  let arcs="";for(let i=0;i<6;i++){const [x1,y1]=nodes[i],[x2,y2]=nodes[(i+1)%6];arcs+='<path d="M'+x1.toFixed(1)+" "+y1.toFixed(1)+" A"+R+" "+R+" 0 0 1 "+x2.toFixed(1)+" "+y2.toFixed(1)+'" fill="none" stroke="'+(i<step?"var(--ink-2)":"var(--line-edge)")+'" stroke-width="2"/>'}
+function ring(step,round,N){
+  N=N||6;const R=40,c=56,nodes=Array.from({length:N},(_,i)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [c+R*Math.cos(a),c+R*Math.sin(a)]});
+  let arcs="";for(let i=0;i<N;i++){const [x1,y1]=nodes[i],[x2,y2]=nodes[(i+1)%N];arcs+='<path d="M'+x1.toFixed(1)+" "+y1.toFixed(1)+" A"+R+" "+R+" 0 0 1 "+x2.toFixed(1)+" "+y2.toFixed(1)+'" fill="none" stroke="'+(i<step?"var(--ink-2)":"var(--line-edge)")+'" stroke-width="2"/>'}
   const dots=nodes.map(([x,y],i)=>'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(i===step?7:4.5)+'" fill="'+(i===step?"var(--accent)":i<step?"var(--ink-2)":"var(--surface)")+'" stroke="'+(i===step?"var(--accent)":i<step?"var(--ink-2)":"var(--ink-4)")+'" stroke-width="1.5"/>').join("");
-  return '<svg class="ring" viewBox="0 0 112 112" role="img" aria-label="Step '+(step+1)+' of 6, round '+round+'">'+arcs+dots+'<text x="56" y="53" text-anchor="middle" font-size="10" fill="var(--ink-3)">Round</text><text x="56" y="70" text-anchor="middle" font-size="17" font-weight="600" fill="var(--ink)">'+round+"</text></svg>";
+  return '<svg class="ring" viewBox="0 0 112 112" role="img" aria-label="Step '+(step+1)+' of '+N+', round '+round+'">'+arcs+dots+'<text x="56" y="53" text-anchor="middle" font-size="10" fill="var(--ink-3)">Round</text><text x="56" y="70" text-anchor="middle" font-size="17" font-weight="600" fill="var(--ink)">'+round+"</text></svg>";
 }
 
 function notesHTML(blocks){
@@ -2021,10 +2029,10 @@ function notesHTML(blocks){
 
 function header(sec,s){
   const i=idx(sec.id);
-  const steps='<ol class="steps">'+STEPS.map((n,k)=>'<li><button data-step="'+k+'" class="'+(k===s.step?"now":k<s.step?"past":"")+'" aria-current="'+(k===s.step?"step":"false")+'" title="Go to '+n.toLowerCase()+'">'+n+"</button></li>").join("")+"</ol>";
+  const steps='<ol class="steps">'+secSteps(sec).map(k=>[STEPS[k],k]).map(([n,k])=>'<li><button data-step="'+k+'" class="'+(k===s.step?"now":k<s.step?"past":"")+'" aria-current="'+(k===s.step?"step":"false")+'" title="Go to '+n.toLowerCase()+'">'+n+"</button></li>").join("")+"</ol>";
   const prev=i>0?secs[i-1]:null,nxt=i<secs.length-1?secs[i+1]:null;
   const nav='<div class="secnav"><button class="btn quiet" data-sec="'+(prev?esc(prev.id):"")+'"'+(prev?' title="'+esc(prev.title)+'"':" disabled")+'>&lsaquo; Previous</button><button class="btn quiet" data-sec="'+(nxt?esc(nxt.id):"")+'"'+(nxt?' title="'+esc(nxt.title)+'"':" disabled")+'>Next &rsaquo;</button></div>';
-  return '<div class="head">'+ring(s.step,s.round)+'<div class="txt"><span class="eyebrow num">Section '+(i+1)+" of "+secs.length+'</span><h2>'+esc(sec.title)+"</h2>"+steps+"</div>"+nav+"</div>";
+  const ss=secSteps(sec);return '<div class="head">'+ring(Math.max(0,ss.indexOf(s.step)),s.round,ss.length)+'<div class="txt"><span class="eyebrow num">Section '+(i+1)+" of "+secs.length+'</span><h2>'+esc(sec.title)+"</h2>"+steps+"</div>"+nav+"</div>";
 }
 
 function render(){
@@ -2037,6 +2045,7 @@ function render(){
   if(!S.cur){m.innerHTML=overview();bindOverview();return}
   const sec=secById(S.cur);if(!sec){S.cur=null;return render()}
   const s=st(sec.id);
+  if(!secSteps(sec).includes(s.step)){s.step=secSteps(sec).find(k=>k>s.step)??lastStep(sec);save()}
   let body="";
   switch(s.step){
     case 0:body=stepRead(sec,s);break;
@@ -2059,13 +2068,14 @@ function dialSVG(r,id,head){return '<svg viewBox="0 0 '+(2*r+12)+" "+(2*r+12)+'"
 function setDial(id,frac,r){const a=document.getElementById(id);if(!a)return;frac=Math.max(0,Math.min(1,frac));a.setAttribute("stroke-dashoffset",String(1-frac));const h=document.getElementById(id+"h");if(h){const ang=frac*2*Math.PI;h.setAttribute("cx",(r+6+r*Math.cos(ang)).toFixed(2));h.setAttribute("cy",(r+6+r*Math.sin(ang)).toFixed(2));h.style.opacity=frac>0?1:0}}
 
 function go(id){S.cur=id||null;if(id){const s=st(id);if(s.status==="new"||s.status==="revisit"){if(s.status==="revisit"){s.status="active";}else s.status="active"}}save();render();scrollTo({top:0,behavior:"smooth"})}
-function next(sec,s){UNDO=[];s.step++;if(s.step===2){s.fc=null}save();render();scrollTo({top:0,behavior:"smooth"})}
+function finishSec(sec,s){UNDO=[];s.status="done";s.focus=[];s.step=0;s.round=1;s.got={};s.fc=null;const n=nextNew(sec);save();toast("Section "+(idx(sec.id)+1)+" done");go(n?n.id:null)}
+function next(sec,s){if(s.step>=lastStep(sec))return finishSec(sec,s);UNDO=[];const a=secSteps(sec);s.step=a[a.indexOf(s.step)+1]??s.step+1;if(s.step===2){s.fc=null}save();render();scrollTo({top:0,behavior:"smooth"})}
 
 /* Overview */
 function overview(){
   const done=secs.filter(s=>statusOf(s.id)==="done").length;
   const nextSec=secs.find(s=>statusOf(s.id)==="active")||secs.find(s=>statusOf(s.id)==="new")||secs.find(s=>statusOf(s.id)==="revisit");
-  const rows=secs.map((s,i)=>{const st0=statusOf(s.id),g=lastGrade(s.id);return '<li><button class="row" data-go="'+esc(s.id)+'"><span class="n num">'+(i+1)+'</span><span class="t">'+esc(s.title)+'<br><span class="meta num">'+s.cards.length+" cards, "+s.points.length+" key points"+(g===null?"":", last brain dump "+pct(g))+'</span></span><span class="chip '+st0+'">'+esc(statusLabel(s.id))+"</span></button></li>"}).join("");
+  const rows=secs.map((s,i)=>{const st0=statusOf(s.id),g=lastGrade(s.id);return '<li><button class="row" data-go="'+esc(s.id)+'"><span class="n num">'+(i+1)+'</span><span class="t">'+esc(s.title)+'<br><span class="meta num">'+s.cards.length+" cards"+(secSteps(s).includes(5)?", "+s.points.length+" key points":", flashcards only")+(g===null?"":", last brain dump "+pct(g))+'</span></span><span class="chip '+st0+'">'+esc(statusLabel(s.id))+"</span></button></li>"}).join("");
   return '<div class="head"><div class="txt"><span class="eyebrow num">'+done+" of "+secs.length+' sections done</span><h2>'+esc(DECK.title)+"</h2>"+(DECK.source?'<span class="small">'+esc(DECK.source)+"</span>":"")+"</div></div>"+
   '<section class="panel"><h3>How each section works</h3><ol class="how"><li>Read the notes for the section.</li><li>Take a brain break.</li><li>Do the flashcards. Loop them as long as you want, or do them on Quizlet and skip this step.</li><li>Take another brain break.</li><li>Brain dump: write everything you remember with the notes closed.</li><li>Mark what you missed, then loop on it or move to the next section.</li></ol>'+
   '<div class="actions">'+(nextSec?'<button class="btn primary" data-go="'+esc(nextSec.id)+'">'+(statusOf(nextSec.id)==="new"?"Start ":"Continue ")+(idx(nextSec.id)+1)+". "+esc(nextSec.title)+"</button>":'<span class="muted">Every section is done. Loop any one again to keep it fresh.</span>')+"</div>"+
@@ -2113,7 +2123,7 @@ function stepCards(sec,s){
     const g=f.got.length,n=f.order.length;
     return '<section class="panel"><span class="eyebrow num">Pass '+s.passes+" done</span><div class=\"tally\"><div><b class=\"okc num\">"+g+'</b><span class="small">got it</span></div><div><b class="noc num">'+f.missed.length+'</b><span class="small">missed</span></div><div><b class="num">'+n+'</b><span class="small">cards</span></div></div>'+
     (f.missed.length?'<div class="notes"><p class="muted">Missed this pass:</p><ul>'+f.missed.map(k=>"<li>"+rich(sec.cards[k][0])+"</li>").join("")+"</ul></div>":"")+
-    '<div class="actions">'+undoBtn(sec)+(f.missed.length?'<button class="btn" id="again-m">Another pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Another pass on all</button>'+'<button class="btn primary" id="go">Take a break <kbd>Enter</kbd></button></div>'+quiz+"</section>";
+    '<div class="actions">'+undoBtn(sec)+(f.missed.length?'<button class="btn" id="again-m">Another pass on the '+f.missed.length+" missed</button>":"")+'<button class="btn" id="again-a">Another pass on all</button>'+'<button class="btn primary" id="go">'+(lastStep(sec)===2?"Finish section":"Take a break")+' <kbd>Enter</kbd></button></div>'+quiz+"</section>";
   }
   const c=sec.cards[f.order[f.pos]];
   return '<section class="panel"><div class="fcbar num"><span>Pass '+s.passes+'</span><button class="loopt'+(S.loop?" on":"")+'" id="loopt" aria-pressed="'+(S.loop?"true":"false")+'" title="Keep shuffling new passes without stopping (L)">Loop'+(S.loop?" on":"")+'</button><span class="track"><i style="width:'+(100*f.pos/f.order.length)+'%"></i></span><span>'+(f.pos+1)+" / "+f.order.length+'</span></div>'+
